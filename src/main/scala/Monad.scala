@@ -20,9 +20,27 @@ trait Monad[F[_]] extends Functor[F] {
 }
 
 
-object Monad {
+object RunMonad {
 	val listMonad = new Monad[List] {
 		def unit[A](a: => A) = List(a)
-		override def flatMap[A,B](ma: List[A])(f: A => List[B]) = ma flatMap f
+		override def flatMap[A, B](ma: List[A])(f: A => List[B]) = ma flatMap f
+	}
+
+	def exclaim(a:String):String = {
+		a + "!"
+	}
+
+	def main(args:Array[String]): Unit = {
+		println("--- Start ---")
+
+		val l1 = List[String]("A", "B")
+
+		val x = listMonad.map(l1)(exclaim)
+		println("x = " + x)
+
+		val z = listMonad.traverse(l1)( a => List(a+"*") )
+		println("z = " + z)
+
+		println("--- End ---")
 	}
 }
