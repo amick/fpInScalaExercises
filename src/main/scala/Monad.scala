@@ -15,8 +15,19 @@ trait Monad[F[_]] extends Functor[F] {
 	def sequence[A](lma: List[F[A]]): F[List[A]] =
 		lma.foldRight(unit(List[A]()))((ma, mla) => map2(ma, mla)(_ :: _))
 
-	def traverse[A,B](la: List[A])(f: A => F[B]): F[List[B]] =
-		la.foldRight(unit(List[B]()))((a, mlb) => map2(f(a), mlb)(_ :: _))
+	def traverse[A,B](la: List[A])(f: A => F[B]): F[List[B]] = {
+    println("### traverse")
+    // llb is a List[List[B]]
+		val retValue = la.foldRight( unit(List[B]()) ) ( (a, llb) => {
+			println("a = " + a)
+			println("llb = " + llb)
+			val m2 = map2(f(a), llb)(_ :: _)
+      println("m2 = " + m2)
+      m2
+		} )
+    println("### end traverse")
+    retValue
+	}
 }
 
 
@@ -33,12 +44,12 @@ object RunMonad {
 	def main(args:Array[String]): Unit = {
 		println("--- Start ---")
 
-		val l1 = List[String]("A", "B")
+		val l = List[String]("1", "2")
 
-		val x = listMonad.map(l1)(exclaim)
+		val x = listMonad.map(l)(exclaim)
 		println("x = " + x)
 
-		val z = listMonad.traverse(l1)( a => List(a+"*") )
+		val z = listMonad.traverse(l)( a => List(a+"*") )
 		println("z = " + z)
 
 		println("--- End ---")
